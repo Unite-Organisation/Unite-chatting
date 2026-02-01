@@ -1,0 +1,19 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+server:
+  servlet:
+    context-path: /v1/api
+
+jwt:
+  secret: nx4bak6442nojjhf83smacno9j31jcch87h=c2ee2ybc2yegce
+  expiration-ms: 3600000
+
+springdoc:
+  swagger-ui:
+    enabled: true

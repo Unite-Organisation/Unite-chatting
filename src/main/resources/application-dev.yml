@@ -1,0 +1,6 @@
+security:
+  enabled: true
+
+spring:
+  flyway:
+    locations: classpath:db/migration,classpath:db/test-data
