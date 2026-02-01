@@ -1,6 +1,7 @@
 package com.app.prod.config.security;
 
 import com.app.prod.config.integration.ApiOrigins;
+import com.app.prod.config.security.internal.ApiKeyAuthFilter;
 import com.app.prod.config.security.jwt.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ import static com.app.prod.config.Constants.BCRYPT_PASSWORD_ENCODER_STRENGTH;
 public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final UserDetailsServiceImpl userDetailsService;
+    private final ApiKeyAuthFilter apiKeyAuthFilter;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -84,9 +86,12 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
+                        .requestMatchers("/v1/api/internal/**").hasRole("INTERNAL_SERVICE")
                         .anyRequest().authenticated()
                 )
+
                 .authenticationProvider(authenticationProvider())
+                .addFilterBefore(apiKeyAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
 

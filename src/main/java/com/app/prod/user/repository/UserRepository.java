@@ -1,5 +1,6 @@
 package com.app.prod.user.repository;
 
+import com.app.prod.internal.dtos.UserDto;
 import com.app.prod.utils.BaseJooqRepository;
 import org.jooq.DSLContext;
 import org.jooq.sources.tables.AppUser;
@@ -21,6 +22,19 @@ public class UserRepository extends BaseJooqRepository<AppUser, AppUserRecord, U
         return dslContext.selectFrom(table)
                 .where(table.USERNAME.eq(username))
                 .fetchOptional();
+    }
+
+    public void updateUser(UserDto userDto) {
+        dslContext.update(APP_USER)
+                .set(APP_USER.USERNAME, userDto.username())
+                .set(APP_USER.EMAIL, userDto.email())
+                .set(APP_USER.FIRST_NAME, userDto.firstName())
+                .set(APP_USER.LAST_NAME, userDto.lastName())
+                .set(APP_USER.PASSWORD, userDto.password())
+                .set(APP_USER.USER_ROLE, userDto.userRole())
+                .set(APP_USER.STATUS, userDto.status().name())
+                .where(APP_USER.ID.eq(userDto.id()))
+                .execute();
     }
 
 }
