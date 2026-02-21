@@ -41,7 +41,8 @@ public class ActivityService {
 
         // only scenario when we dont want any update is when status was offline and update is also offline
         if (!(ActivityStatus.OFFLINE.equals(status) && ActivityStatus.OFFLINE.name().equals(userActivityRecord.getStatus()))) {
-            activityRepository.updateStatus(userId, status);
+            var now = LocalDateTime.now(clock);
+            activityRepository.updateStatus(userId, status, now);
         }
 
     }

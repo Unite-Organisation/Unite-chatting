@@ -7,6 +7,7 @@ import org.jooq.sources.tables.Activity;
 import org.jooq.sources.tables.records.ActivityRecord;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,9 +29,10 @@ public class ActivityRepository extends BaseJooqRepository<Activity, ActivityRec
 
     }
 
-    public void updateStatus(UUID userId, ActivityStatus status) {
+    public void updateStatus(UUID userId, ActivityStatus status, LocalDateTime now) {
         dslContext.update(ACTIVITY)
                 .set(ACTIVITY.STATUS, status.name())
+                .set(ACTIVITY.LAST_SEEN, now)
                 .where(ACTIVITY.USER_ID.eq(userId))
                 .execute();
     }
