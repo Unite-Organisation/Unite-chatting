@@ -9,6 +9,7 @@ import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.sources.tables.Activity;
 import org.jooq.sources.tables.AppUser;
 import org.jooq.sources.tables.Conversation;
 import org.jooq.sources.tables.ConversationMember;
@@ -16,6 +17,7 @@ import org.jooq.sources.tables.FlywaySchemaHistory;
 import org.jooq.sources.tables.Message;
 import org.jooq.sources.tables.MessagesRead;
 import org.jooq.sources.tables.UserRole;
+import org.jooq.sources.tables.records.ActivityRecord;
 import org.jooq.sources.tables.records.AppUserRecord;
 import org.jooq.sources.tables.records.ConversationMemberRecord;
 import org.jooq.sources.tables.records.ConversationRecord;
@@ -36,6 +38,7 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<ActivityRecord> ACTIVITY_PKEY = Internal.createUniqueKey(Activity.ACTIVITY, DSL.name("activity_pkey"), new TableField[] { Activity.ACTIVITY.ID }, true);
     public static final UniqueKey<AppUserRecord> APP_USER_EMAIL_KEY = Internal.createUniqueKey(AppUser.APP_USER, DSL.name("app_user_email_key"), new TableField[] { AppUser.APP_USER.EMAIL }, true);
     public static final UniqueKey<AppUserRecord> APP_USER_PKEY = Internal.createUniqueKey(AppUser.APP_USER, DSL.name("app_user_pkey"), new TableField[] { AppUser.APP_USER.ID }, true);
     public static final UniqueKey<AppUserRecord> APP_USER_USERNAME_KEY = Internal.createUniqueKey(AppUser.APP_USER, DSL.name("app_user_username_key"), new TableField[] { AppUser.APP_USER.USERNAME }, true);
@@ -50,6 +53,7 @@ public class Keys {
     // FOREIGN KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final ForeignKey<ActivityRecord, AppUserRecord> ACTIVITY__ACTIVITY_USER_ID_FKEY = Internal.createForeignKey(Activity.ACTIVITY, DSL.name("activity_user_id_fkey"), new TableField[] { Activity.ACTIVITY.USER_ID }, Keys.APP_USER_PKEY, new TableField[] { AppUser.APP_USER.ID }, true);
     public static final ForeignKey<AppUserRecord, UserRoleRecord> APP_USER__APP_USER_USER_ROLE_FKEY = Internal.createForeignKey(AppUser.APP_USER, DSL.name("app_user_user_role_fkey"), new TableField[] { AppUser.APP_USER.USER_ROLE }, Keys.USER_ROLE_PKEY, new TableField[] { UserRole.USER_ROLE.ID }, true);
     public static final ForeignKey<ConversationMemberRecord, ConversationRecord> CONVERSATION_MEMBER__CONVERSATION_MEMBER_CONVERSATION_ID_FKEY = Internal.createForeignKey(ConversationMember.CONVERSATION_MEMBER, DSL.name("conversation_member_conversation_id_fkey"), new TableField[] { ConversationMember.CONVERSATION_MEMBER.CONVERSATION_ID }, Keys.CONVERSATION_PKEY, new TableField[] { Conversation.CONVERSATION.ID }, true);
     public static final ForeignKey<ConversationMemberRecord, AppUserRecord> CONVERSATION_MEMBER__CONVERSATION_MEMBER_USER_ID_FKEY = Internal.createForeignKey(ConversationMember.CONVERSATION_MEMBER, DSL.name("conversation_member_user_id_fkey"), new TableField[] { ConversationMember.CONVERSATION_MEMBER.USER_ID }, Keys.APP_USER_PKEY, new TableField[] { AppUser.APP_USER.ID }, true);

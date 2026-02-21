@@ -10,6 +10,7 @@ import java.util.List;
 import org.jooq.Catalog;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
+import org.jooq.sources.tables.Activity;
 import org.jooq.sources.tables.AppUser;
 import org.jooq.sources.tables.Conversation;
 import org.jooq.sources.tables.ConversationMember;
@@ -31,6 +32,11 @@ public class Public extends SchemaImpl {
      * The reference instance of <code>public</code>
      */
     public static final Public PUBLIC = new Public();
+
+    /**
+     * The table <code>public.activity</code>.
+     */
+    public final Activity ACTIVITY = Activity.ACTIVITY;
 
     /**
      * The table <code>public.app_user</code>.
@@ -83,6 +89,7 @@ public class Public extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.asList(
+            Activity.ACTIVITY,
             AppUser.APP_USER,
             Conversation.CONVERSATION,
             ConversationMember.CONVERSATION_MEMBER,

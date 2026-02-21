@@ -1,6 +1,8 @@
 package com.app.prod.utils;
 
+import com.app.prod.conversation.repository.ConversationMemberRepository;
 import com.app.prod.conversation.repository.ConversationRepository;
+import com.app.prod.exceptions.exceptions.BadRequestException;
 import com.app.prod.exceptions.exceptions.DataAlreadyExistsException;
 import com.app.prod.exceptions.exceptions.EntityNotPresentException;
 import com.app.prod.user.repository.UserRepository;
@@ -18,6 +20,7 @@ import java.util.UUID;
 public class Validate {
     private final UserRepository userRepository;
     private final ConversationRepository conversationRepository;
+    private final ConversationMemberRepository conversationMemberRepository;
 
     public void user(UUID id){
         if(!userRepository.exists(id)){
@@ -28,18 +31,18 @@ public class Validate {
         }
     }
 
-    public void thatUsernameIsFree(String username){
-        if(userRepository.findByUsername(username).isPresent()){
-            throw new DataAlreadyExistsException("This username is already taken.");
-        }
-    }
-
     public void conversation(UUID id){
         if(!conversationRepository.exists(id)){
             throw new EntityNotPresentException(
                     String.format("Conversation with id: %s doesn't exist.", id),
                     Conversation.class.getSimpleName()
             );
+        }
+    }
+
+    public void thatUserBelongsToConversation(UUID userId, UUID conversationId){
+        if(!conversationMemberRepository.userBelongToConversation(userId, conversationId)){
+            throw new BadRequestException(String.format("User: %s does not belong to conversation: %s", userId, conversationId));
         }
     }
 }

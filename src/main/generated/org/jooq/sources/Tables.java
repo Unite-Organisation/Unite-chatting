@@ -4,6 +4,7 @@
 package org.jooq.sources;
 
 
+import org.jooq.sources.tables.Activity;
 import org.jooq.sources.tables.AppUser;
 import org.jooq.sources.tables.Conversation;
 import org.jooq.sources.tables.ConversationMember;
@@ -18,6 +19,11 @@ import org.jooq.sources.tables.UserRole;
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
+
+    /**
+     * The table <code>public.activity</code>.
+     */
+    public static final Activity ACTIVITY = Activity.ACTIVITY;
 
     /**
      * The table <code>public.app_user</code>.

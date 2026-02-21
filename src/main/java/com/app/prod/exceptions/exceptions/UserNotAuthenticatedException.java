@@ -1,0 +1,7 @@
+package com.app.prod.exceptions.exceptions;
+
+public class UserNotAuthenticatedException extends RuntimeException {
+    public UserNotAuthenticatedException(String message) {
+        super(message);
+    }
+}

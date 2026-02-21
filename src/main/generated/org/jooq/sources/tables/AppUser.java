@@ -32,6 +32,7 @@ import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.sources.Keys;
 import org.jooq.sources.Public;
+import org.jooq.sources.tables.Activity.ActivityPath;
 import org.jooq.sources.tables.ConversationMember.ConversationMemberPath;
 import org.jooq.sources.tables.Message.MessagePath;
 import org.jooq.sources.tables.MessagesRead.MessagesReadPath;
@@ -197,6 +198,19 @@ public class AppUser extends TableImpl<AppUserRecord> {
             _userRole = new UserRolePath(this, Keys.APP_USER__APP_USER_USER_ROLE_FKEY, null);
 
         return _userRole;
+    }
+
+    private transient ActivityPath _activity;
+
+    /**
+     * Get the implicit to-many join path to the <code>public.activity</code>
+     * table
+     */
+    public ActivityPath activity() {
+        if (_activity == null)
+            _activity = new ActivityPath(this, null, Keys.ACTIVITY__ACTIVITY_USER_ID_FKEY.getInverseKey());
+
+        return _activity;
     }
 
     private transient ConversationMemberPath _conversationMember;
