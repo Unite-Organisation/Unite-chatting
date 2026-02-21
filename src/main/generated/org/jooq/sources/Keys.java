@@ -10,10 +10,18 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
 import org.jooq.sources.tables.AppUser;
+import org.jooq.sources.tables.Conversation;
+import org.jooq.sources.tables.ConversationMember;
 import org.jooq.sources.tables.FlywaySchemaHistory;
+import org.jooq.sources.tables.Message;
+import org.jooq.sources.tables.MessagesRead;
 import org.jooq.sources.tables.UserRole;
 import org.jooq.sources.tables.records.AppUserRecord;
+import org.jooq.sources.tables.records.ConversationMemberRecord;
+import org.jooq.sources.tables.records.ConversationRecord;
 import org.jooq.sources.tables.records.FlywaySchemaHistoryRecord;
+import org.jooq.sources.tables.records.MessageRecord;
+import org.jooq.sources.tables.records.MessagesReadRecord;
 import org.jooq.sources.tables.records.UserRoleRecord;
 
 
@@ -31,7 +39,11 @@ public class Keys {
     public static final UniqueKey<AppUserRecord> APP_USER_EMAIL_KEY = Internal.createUniqueKey(AppUser.APP_USER, DSL.name("app_user_email_key"), new TableField[] { AppUser.APP_USER.EMAIL }, true);
     public static final UniqueKey<AppUserRecord> APP_USER_PKEY = Internal.createUniqueKey(AppUser.APP_USER, DSL.name("app_user_pkey"), new TableField[] { AppUser.APP_USER.ID }, true);
     public static final UniqueKey<AppUserRecord> APP_USER_USERNAME_KEY = Internal.createUniqueKey(AppUser.APP_USER, DSL.name("app_user_username_key"), new TableField[] { AppUser.APP_USER.USERNAME }, true);
+    public static final UniqueKey<ConversationRecord> CONVERSATION_PKEY = Internal.createUniqueKey(Conversation.CONVERSATION, DSL.name("conversation_pkey"), new TableField[] { Conversation.CONVERSATION.ID }, true);
+    public static final UniqueKey<ConversationMemberRecord> CONVERSATION_MEMBER_PKEY = Internal.createUniqueKey(ConversationMember.CONVERSATION_MEMBER, DSL.name("conversation_member_pkey"), new TableField[] { ConversationMember.CONVERSATION_MEMBER.ID }, true);
     public static final UniqueKey<FlywaySchemaHistoryRecord> FLYWAY_SCHEMA_HISTORY_PK = Internal.createUniqueKey(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, DSL.name("flyway_schema_history_pk"), new TableField[] { FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK }, true);
+    public static final UniqueKey<MessageRecord> MESSAGE_PKEY = Internal.createUniqueKey(Message.MESSAGE, DSL.name("message_pkey"), new TableField[] { Message.MESSAGE.ID }, true);
+    public static final UniqueKey<MessagesReadRecord> MESSAGES_READ_PKEY = Internal.createUniqueKey(MessagesRead.MESSAGES_READ, DSL.name("messages_read_pkey"), new TableField[] { MessagesRead.MESSAGES_READ.MESSAGE_ID, MessagesRead.MESSAGES_READ.VIEWED_BY }, true);
     public static final UniqueKey<UserRoleRecord> USER_ROLE_PKEY = Internal.createUniqueKey(UserRole.USER_ROLE, DSL.name("user_role_pkey"), new TableField[] { UserRole.USER_ROLE.ID }, true);
 
     // -------------------------------------------------------------------------
@@ -39,4 +51,10 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final ForeignKey<AppUserRecord, UserRoleRecord> APP_USER__APP_USER_USER_ROLE_FKEY = Internal.createForeignKey(AppUser.APP_USER, DSL.name("app_user_user_role_fkey"), new TableField[] { AppUser.APP_USER.USER_ROLE }, Keys.USER_ROLE_PKEY, new TableField[] { UserRole.USER_ROLE.ID }, true);
+    public static final ForeignKey<ConversationMemberRecord, ConversationRecord> CONVERSATION_MEMBER__CONVERSATION_MEMBER_CONVERSATION_ID_FKEY = Internal.createForeignKey(ConversationMember.CONVERSATION_MEMBER, DSL.name("conversation_member_conversation_id_fkey"), new TableField[] { ConversationMember.CONVERSATION_MEMBER.CONVERSATION_ID }, Keys.CONVERSATION_PKEY, new TableField[] { Conversation.CONVERSATION.ID }, true);
+    public static final ForeignKey<ConversationMemberRecord, AppUserRecord> CONVERSATION_MEMBER__CONVERSATION_MEMBER_USER_ID_FKEY = Internal.createForeignKey(ConversationMember.CONVERSATION_MEMBER, DSL.name("conversation_member_user_id_fkey"), new TableField[] { ConversationMember.CONVERSATION_MEMBER.USER_ID }, Keys.APP_USER_PKEY, new TableField[] { AppUser.APP_USER.ID }, true);
+    public static final ForeignKey<MessageRecord, ConversationRecord> MESSAGE__MESSAGE_CONVERSATION_ID_FKEY = Internal.createForeignKey(Message.MESSAGE, DSL.name("message_conversation_id_fkey"), new TableField[] { Message.MESSAGE.CONVERSATION_ID }, Keys.CONVERSATION_PKEY, new TableField[] { Conversation.CONVERSATION.ID }, true);
+    public static final ForeignKey<MessageRecord, AppUserRecord> MESSAGE__MESSAGE_SENDER_ID_FKEY = Internal.createForeignKey(Message.MESSAGE, DSL.name("message_sender_id_fkey"), new TableField[] { Message.MESSAGE.SENDER_ID }, Keys.APP_USER_PKEY, new TableField[] { AppUser.APP_USER.ID }, true);
+    public static final ForeignKey<MessagesReadRecord, MessageRecord> MESSAGES_READ__MESSAGES_READ_MESSAGE_ID_FKEY = Internal.createForeignKey(MessagesRead.MESSAGES_READ, DSL.name("messages_read_message_id_fkey"), new TableField[] { MessagesRead.MESSAGES_READ.MESSAGE_ID }, Keys.MESSAGE_PKEY, new TableField[] { Message.MESSAGE.ID }, true);
+    public static final ForeignKey<MessagesReadRecord, AppUserRecord> MESSAGES_READ__MESSAGES_READ_VIEWED_BY_FKEY = Internal.createForeignKey(MessagesRead.MESSAGES_READ, DSL.name("messages_read_viewed_by_fkey"), new TableField[] { MessagesRead.MESSAGES_READ.VIEWED_BY }, Keys.APP_USER_PKEY, new TableField[] { AppUser.APP_USER.ID }, true);
 }

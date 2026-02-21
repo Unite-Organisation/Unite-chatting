@@ -5,7 +5,11 @@ package org.jooq.sources;
 
 
 import org.jooq.sources.tables.AppUser;
+import org.jooq.sources.tables.Conversation;
+import org.jooq.sources.tables.ConversationMember;
 import org.jooq.sources.tables.FlywaySchemaHistory;
+import org.jooq.sources.tables.Message;
+import org.jooq.sources.tables.MessagesRead;
 import org.jooq.sources.tables.UserRole;
 
 
@@ -21,9 +25,29 @@ public class Tables {
     public static final AppUser APP_USER = AppUser.APP_USER;
 
     /**
+     * The table <code>public.conversation</code>.
+     */
+    public static final Conversation CONVERSATION = Conversation.CONVERSATION;
+
+    /**
+     * The table <code>public.conversation_member</code>.
+     */
+    public static final ConversationMember CONVERSATION_MEMBER = ConversationMember.CONVERSATION_MEMBER;
+
+    /**
      * The table <code>public.flyway_schema_history</code>.
      */
     public static final FlywaySchemaHistory FLYWAY_SCHEMA_HISTORY = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY;
+
+    /**
+     * The table <code>public.message</code>.
+     */
+    public static final Message MESSAGE = Message.MESSAGE;
+
+    /**
+     * The table <code>public.messages_read</code>.
+     */
+    public static final MessagesRead MESSAGES_READ = MessagesRead.MESSAGES_READ;
 
     /**
      * The table <code>public.user_role</code>.

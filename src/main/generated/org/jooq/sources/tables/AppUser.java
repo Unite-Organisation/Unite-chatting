@@ -32,6 +32,9 @@ import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.sources.Keys;
 import org.jooq.sources.Public;
+import org.jooq.sources.tables.ConversationMember.ConversationMemberPath;
+import org.jooq.sources.tables.Message.MessagePath;
+import org.jooq.sources.tables.MessagesRead.MessagesReadPath;
 import org.jooq.sources.tables.UserRole.UserRolePath;
 import org.jooq.sources.tables.records.AppUserRecord;
 
@@ -194,6 +197,45 @@ public class AppUser extends TableImpl<AppUserRecord> {
             _userRole = new UserRolePath(this, Keys.APP_USER__APP_USER_USER_ROLE_FKEY, null);
 
         return _userRole;
+    }
+
+    private transient ConversationMemberPath _conversationMember;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.conversation_member</code> table
+     */
+    public ConversationMemberPath conversationMember() {
+        if (_conversationMember == null)
+            _conversationMember = new ConversationMemberPath(this, null, Keys.CONVERSATION_MEMBER__CONVERSATION_MEMBER_USER_ID_FKEY.getInverseKey());
+
+        return _conversationMember;
+    }
+
+    private transient MessagePath _message;
+
+    /**
+     * Get the implicit to-many join path to the <code>public.message</code>
+     * table
+     */
+    public MessagePath message() {
+        if (_message == null)
+            _message = new MessagePath(this, null, Keys.MESSAGE__MESSAGE_SENDER_ID_FKEY.getInverseKey());
+
+        return _message;
+    }
+
+    private transient MessagesReadPath _messagesRead;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.messages_read</code> table
+     */
+    public MessagesReadPath messagesRead() {
+        if (_messagesRead == null)
+            _messagesRead = new MessagesReadPath(this, null, Keys.MESSAGES_READ__MESSAGES_READ_VIEWED_BY_FKEY.getInverseKey());
+
+        return _messagesRead;
     }
 
     @Override

@@ -24,6 +24,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static com.app.prod.config.Constants.BCRYPT_PASSWORD_ENCODER_STRENGTH;
 
@@ -84,7 +85,8 @@ public class SecurityConfig {
                                 "/healthcheck",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/ws/**"
                         ).permitAll()
                         .requestMatchers("/v1/api/internal/**").hasRole("INTERNAL_SERVICE")
                         .anyRequest().authenticated()

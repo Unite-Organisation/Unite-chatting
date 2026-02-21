@@ -15,7 +15,7 @@ public abstract class IntegrationTest {
 
     static {
         postgres.setPortBindings(
-                java.util.List.of("5433:5432")
+                java.util.List.of("5434:5432")
         );
         postgres.start();
     }

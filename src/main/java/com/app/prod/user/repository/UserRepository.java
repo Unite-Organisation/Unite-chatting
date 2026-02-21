@@ -7,6 +7,7 @@ import org.jooq.sources.tables.AppUser;
 import org.jooq.sources.tables.records.AppUserRecord;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 

@@ -11,7 +11,11 @@ import org.jooq.Catalog;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
 import org.jooq.sources.tables.AppUser;
+import org.jooq.sources.tables.Conversation;
+import org.jooq.sources.tables.ConversationMember;
 import org.jooq.sources.tables.FlywaySchemaHistory;
+import org.jooq.sources.tables.Message;
+import org.jooq.sources.tables.MessagesRead;
 import org.jooq.sources.tables.UserRole;
 
 
@@ -34,9 +38,29 @@ public class Public extends SchemaImpl {
     public final AppUser APP_USER = AppUser.APP_USER;
 
     /**
+     * The table <code>public.conversation</code>.
+     */
+    public final Conversation CONVERSATION = Conversation.CONVERSATION;
+
+    /**
+     * The table <code>public.conversation_member</code>.
+     */
+    public final ConversationMember CONVERSATION_MEMBER = ConversationMember.CONVERSATION_MEMBER;
+
+    /**
      * The table <code>public.flyway_schema_history</code>.
      */
     public final FlywaySchemaHistory FLYWAY_SCHEMA_HISTORY = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY;
+
+    /**
+     * The table <code>public.message</code>.
+     */
+    public final Message MESSAGE = Message.MESSAGE;
+
+    /**
+     * The table <code>public.messages_read</code>.
+     */
+    public final MessagesRead MESSAGES_READ = MessagesRead.MESSAGES_READ;
 
     /**
      * The table <code>public.user_role</code>.
@@ -60,7 +84,11 @@ public class Public extends SchemaImpl {
     public final List<Table<?>> getTables() {
         return Arrays.asList(
             AppUser.APP_USER,
+            Conversation.CONVERSATION,
+            ConversationMember.CONVERSATION_MEMBER,
             FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY,
+            Message.MESSAGE,
+            MessagesRead.MESSAGES_READ,
             UserRole.USER_ROLE
         );
     }
