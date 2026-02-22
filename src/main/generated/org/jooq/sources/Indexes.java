@@ -8,7 +8,11 @@ import org.jooq.Index;
 import org.jooq.OrderField;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.sources.tables.Activity;
+import org.jooq.sources.tables.Conversation;
+import org.jooq.sources.tables.ConversationMember;
 import org.jooq.sources.tables.FlywaySchemaHistory;
+import org.jooq.sources.tables.Message;
 
 
 /**
@@ -22,4 +26,9 @@ public class Indexes {
     // -------------------------------------------------------------------------
 
     public static final Index FLYWAY_SCHEMA_HISTORY_S_IDX = Internal.createIndex(DSL.name("flyway_schema_history_s_idx"), FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, new OrderField[] { FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.SUCCESS }, false);
+    public static final Index IDX_ACTIVITY_USER_STATUS = Internal.createIndex(DSL.name("idx_activity_user_status"), Activity.ACTIVITY, new OrderField[] { Activity.ACTIVITY.USER_ID, Activity.ACTIVITY.STATUS }, false);
+    public static final Index IDX_CONV_MEMBER_CONV = Internal.createIndex(DSL.name("idx_conv_member_conv"), ConversationMember.CONVERSATION_MEMBER, new OrderField[] { ConversationMember.CONVERSATION_MEMBER.CONVERSATION_ID }, false);
+    public static final Index IDX_CONV_MEMBER_USER = Internal.createIndex(DSL.name("idx_conv_member_user"), ConversationMember.CONVERSATION_MEMBER, new OrderField[] { ConversationMember.CONVERSATION_MEMBER.USER_ID }, false);
+    public static final Index IDX_CONVERSATION_UPDATED_AT_DESC = Internal.createIndex(DSL.name("idx_conversation_updated_at_desc"), Conversation.CONVERSATION, new OrderField[] { Conversation.CONVERSATION.UPDATED_AT.desc() }, false);
+    public static final Index IDX_MESSAGE_CONVERSATION_PAGINATION = Internal.createIndex(DSL.name("idx_message_conversation_pagination"), Message.MESSAGE, new OrderField[] { Message.MESSAGE.CONVERSATION_ID, Message.MESSAGE.SEND_AT }, false);
 }

@@ -1,5 +1,6 @@
 package com.app.prod.messaging;
 
+import com.app.prod.builders.ActivityPersistanceFactory;
 import com.app.prod.builders.ConversationMemberPersistanceFactory;
 import com.app.prod.builders.ConversationPersistanceFactory;
 import com.app.prod.builders.UserPersistanceFactory;
@@ -54,6 +55,8 @@ public class MessagesWebSocketIT extends IntegrationTest {
     @Autowired
     private ConversationMemberPersistanceFactory conversationMemberPersistanceFactory;
     @Autowired
+    private ActivityPersistanceFactory activityPersistanceFactory;
+    @Autowired
     private UserService userService;
     @Autowired
     private ObjectMapper objectMapper;
@@ -72,6 +75,9 @@ public class MessagesWebSocketIT extends IntegrationTest {
                 .withRandomValues()
                 .password(passwordEncoder.encode("testowehaslo"))
                 .buildAndSave();
+
+        activityPersistanceFactory.getNewActivity().withRandomValues().userId(user1.getId()).buildAndSave();
+        activityPersistanceFactory.getNewActivity().withRandomValues().userId(user2.getId()).buildAndSave();
 
         conversation = conversationPersistanceFactory.getNewConversation()
                 .withRandomValues()
@@ -128,7 +134,6 @@ public class MessagesWebSocketIT extends IntegrationTest {
         assertEquals("Cześć z testu!", response.content());
     }
 
-
     @Test
     void shouldUserReceiveMessageFromAnotherUser() throws Exception {
 
@@ -172,4 +177,5 @@ public class MessagesWebSocketIT extends IntegrationTest {
         assertEquals(messageText, receivedBySecondUser.content());
         assertEquals(user1.getId(), receivedBySecondUser.authorId());
     }
+
 }

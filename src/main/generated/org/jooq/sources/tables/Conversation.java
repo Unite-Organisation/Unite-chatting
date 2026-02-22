@@ -5,12 +5,15 @@ package org.jooq.sources.tables;
 
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Index;
 import org.jooq.InverseForeignKey;
 import org.jooq.Name;
 import org.jooq.Path;
@@ -28,6 +31,7 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+import org.jooq.sources.Indexes;
 import org.jooq.sources.Keys;
 import org.jooq.sources.Public;
 import org.jooq.sources.tables.ConversationMember.ConversationMemberPath;
@@ -146,6 +150,11 @@ public class Conversation extends TableImpl<ConversationRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
+    }
+
+    @Override
+    public List<Index> getIndexes() {
+        return Arrays.asList(Indexes.IDX_CONVERSATION_UPDATED_AT_DESC);
     }
 
     @Override

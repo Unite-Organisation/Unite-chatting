@@ -13,6 +13,7 @@ import java.util.UUID;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Index;
 import org.jooq.InverseForeignKey;
 import org.jooq.Name;
 import org.jooq.Path;
@@ -30,6 +31,7 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+import org.jooq.sources.Indexes;
 import org.jooq.sources.Keys;
 import org.jooq.sources.Public;
 import org.jooq.sources.tables.AppUser.AppUserPath;
@@ -142,6 +144,11 @@ public class Activity extends TableImpl<ActivityRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
+    }
+
+    @Override
+    public List<Index> getIndexes() {
+        return Arrays.asList(Indexes.IDX_ACTIVITY_USER_STATUS);
     }
 
     @Override

@@ -44,7 +44,7 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
         switch (accessor.getCommand()) {
             case CONNECT -> handleConnect(accessor);
             case SUBSCRIBE -> handleSubscribe(accessor);
-            case DISCONNECT, UNSUBSCRIBE -> handleDisconnectUnsubscribe(accessor);
+            case DISCONNECT -> handleDisconnectUnsubscribe(accessor);
             case SEND -> handleSend(accessor, message);
         }
 
