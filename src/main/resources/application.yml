@@ -8,9 +8,13 @@ spring:
     driver-class-name: org.postgresql.Driver
   cloud:
     gcp:
-      project-id: ${GOOGLE_PROJECT_ID}
+      project-id: ${GCP_PROJECT_ID}
       credentials:
-        location: ${GOOGLE_APPLICATION_CREDENTIALS}
+        location: ${GCP_APPLICATION_CREDENTIALS}
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
 server:
   servlet:
     context-path: /v1/api
@@ -27,5 +31,9 @@ springdoc:
 services:
   chatting:
     apikey: vV3KptV5DpX
+
+gcp:
+  bucket:
+    name: ${GCP_BUCKET_NAME}
 
 

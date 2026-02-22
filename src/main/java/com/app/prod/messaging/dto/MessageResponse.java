@@ -1,5 +1,7 @@
 package com.app.prod.messaging.dto;
 
+import com.app.prod.messaging.repository.MessageType;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -9,6 +11,7 @@ public record MessageResponse (
     UUID authorId,
     String authorDisplayName,
     String content,
-    LocalDateTime sentAt
+    LocalDateTime sentAt,
+    MessageType messageType
 ) {
 }

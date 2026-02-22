@@ -11,6 +11,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 
+import java.security.Principal;
+
 @Controller
 @RequiredArgsConstructor
 @Slf4j
@@ -21,7 +23,7 @@ public class MessageSocketApi {
     private final WebSocketUserManager webSocketUserManager;
 
     @MessageMapping("/message")
-    public void sendMessage(CreateMessageRequest request, java.security.Principal principal){
+    public void sendMessage(CreateMessageRequest request, Principal principal){
         var user = webSocketUserManager.getCurrentUser((UsernamePasswordAuthenticationToken) principal);
         MessageResponse response = messageService.createMessage(request, user);
         messagingTemplate.convertAndSend("/topic/conversation/" + request.conversationId(), response);

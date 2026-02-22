@@ -84,6 +84,11 @@ public class Message extends TableImpl<MessageRecord> {
      */
     public final TableField<MessageRecord, LocalDateTime> SEND_AT = createField(DSL.name("send_at"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.LOCALDATETIME)), this, "");
 
+    /**
+     * The column <code>public.message.message_type</code>.
+     */
+    public final TableField<MessageRecord, String> MESSAGE_TYPE = createField(DSL.name("message_type"), SQLDataType.VARCHAR(30).nullable(false).defaultValue(DSL.field(DSL.raw("'TEXT'::character varying"), SQLDataType.VARCHAR)), this, "");
+
     private Message(Name alias, Table<MessageRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
     }

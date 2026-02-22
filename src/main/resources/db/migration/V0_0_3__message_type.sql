@@ -1,0 +1,2 @@
+ALTER TABLE message
+ ADD COLUMN message_type VARCHAR(30) NOT NULL DEFAULT 'TEXT';

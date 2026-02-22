@@ -27,7 +27,8 @@ public class MessageRepository extends BaseJooqRepository<Message, MessageRecord
                         APP_USER.FIRST_NAME,
                         APP_USER.LAST_NAME,
                         MESSAGE.SEND_AT,
-                        MESSAGE.CONTENT
+                        MESSAGE.CONTENT,
+                        MESSAGE.MESSAGE_TYPE
                 )
                 .from(MESSAGE)
                 .leftJoin(APP_USER).on(APP_USER.ID.eq(MESSAGE.SENDER_ID))
@@ -40,7 +41,8 @@ public class MessageRepository extends BaseJooqRepository<Message, MessageRecord
                         record.get(APP_USER.FIRST_NAME),
                         record.get(APP_USER.LAST_NAME),
                         record.get(MESSAGE.SEND_AT),
-                        record.get(MESSAGE.CONTENT)
+                        record.get(MESSAGE.CONTENT),
+                        MessageType.valueOf(record.get(MESSAGE.MESSAGE_TYPE))
                 ));
     }
 }

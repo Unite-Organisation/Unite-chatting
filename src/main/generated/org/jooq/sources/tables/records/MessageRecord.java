@@ -90,6 +90,20 @@ public class MessageRecord extends UpdatableRecordImpl<MessageRecord> {
         return (LocalDateTime) get(4);
     }
 
+    /**
+     * Setter for <code>public.message.message_type</code>.
+     */
+    public void setMessageType(String value) {
+        set(5, value);
+    }
+
+    /**
+     * Getter for <code>public.message.message_type</code>.
+     */
+    public String getMessageType() {
+        return (String) get(5);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -113,7 +127,7 @@ public class MessageRecord extends UpdatableRecordImpl<MessageRecord> {
     /**
      * Create a detached, initialised MessageRecord
      */
-    public MessageRecord(UUID id, UUID senderId, UUID conversationId, String content, LocalDateTime sendAt) {
+    public MessageRecord(UUID id, UUID senderId, UUID conversationId, String content, LocalDateTime sendAt, String messageType) {
         super(Message.MESSAGE);
 
         setId(id);
@@ -121,6 +135,7 @@ public class MessageRecord extends UpdatableRecordImpl<MessageRecord> {
         setConversationId(conversationId);
         setContent(content);
         setSendAt(sendAt);
+        setMessageType(messageType);
         resetChangedOnNotNull();
     }
 }
