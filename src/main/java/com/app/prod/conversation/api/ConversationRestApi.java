@@ -39,10 +39,7 @@ public class ConversationRestApi {
     }
 
     @GetMapping("/{id}")
-    public List<ConversationMessageResponse> getConversationContent(
-            @PathVariable UUID id,
-            @Valid @ModelAttribute Pagination pagination
-    ){
+    public List<ConversationMessageResponse> getConversationContent(@PathVariable UUID id, @Valid @ModelAttribute Pagination pagination){
         return conversationService.getConversationContent(id, pagination);
     }
 

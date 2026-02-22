@@ -12,24 +12,6 @@ import java.util.UUID;
 
 public class ConversationMapper {
 
-    public static ConversationResponse fromRecordToResponse(ConversationRecord conversationsRecord){
-        return new ConversationResponse(
-                conversationsRecord.getId(),
-                conversationsRecord.getIsGroup(),
-                conversationsRecord.getName(),
-                conversationsRecord.getCreatedAt(),
-                conversationsRecord.getUpdatedAt()
-        );
-    }
-
-    public static List<ConversationResponse> fromRecordsToResponses(List<ConversationRecord> conversations){
-        List<ConversationResponse> response = new ArrayList<>();
-        for(var conversation : conversations){
-            response.add(fromRecordToResponse(conversation));
-        }
-        return response;
-    }
-
     public static ConversationRecord fromRequestToRecord(ConversationRequest request, UUID id, LocalDateTime now) {
         return new ConversationRecord(
                 id,

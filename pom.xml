@@ -169,6 +169,11 @@
 			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>spring-cloud-gcp-starter-storage</artifactId>
+			<version>5.0.0</version>
+		</dependency>
 
 	</dependencies>
 

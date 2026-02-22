@@ -27,6 +27,9 @@ target/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
+.env
+/src/main/resources/gcp-account-file.json
+gcp-account-file.json
 
 ### VS Code ###
 .vscode/

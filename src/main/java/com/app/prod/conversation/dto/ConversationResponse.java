@@ -8,6 +8,7 @@ public record ConversationResponse(
         Boolean isGroup,
         String name,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        boolean active
 ) {
 }

@@ -1,9 +1,11 @@
 package com.app.prod.conversation.repository;
 
+import com.app.prod.activity.enums.ActivityStatus;
 import com.app.prod.conversation.dto.ConversationResponse;
 import com.app.prod.utils.BaseJooqRepository;
 import com.app.prod.utils.Pagination;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.impl.DSL;
 import org.jooq.sources.tables.Conversation;
 import org.jooq.sources.tables.records.ConversationRecord;
@@ -38,16 +40,28 @@ public class ConversationRepository extends BaseJooqRepository<Conversation, Con
         var otherCm = CONVERSATION_MEMBER.as("other_cm");
         var otherUser = APP_USER.as("other_user");
 
-        var nameField = when(CONVERSATION.IS_GROUP.isTrue(), CONVERSATION.NAME)
+        Field<String> nameField = when(CONVERSATION.IS_GROUP.isTrue(), CONVERSATION.NAME)
                 .otherwise(concat(otherUser.FIRST_NAME, inline(" "), otherUser.LAST_NAME))
                 .as("name");
+
+        Field<Boolean> isActiveField = field(
+                DSL.exists(
+                        selectOne()
+                                .from(otherCm)
+                                .join(ACTIVITY).on(ACTIVITY.USER_ID.eq(otherCm.USER_ID))
+                                .where(otherCm.CONVERSATION_ID.eq(CONVERSATION.ID))
+                                .and(otherCm.USER_ID.ne(userId))
+                                .and(ACTIVITY.STATUS.eq("ONLINE"))
+                )
+        ).as("isActive");
 
         return dslContext.select(
                         CONVERSATION.ID,
                         CONVERSATION.IS_GROUP,
                         nameField,
                         CONVERSATION.CREATED_AT,
-                        CONVERSATION.UPDATED_AT
+                        CONVERSATION.UPDATED_AT,
+                        isActiveField
                 )
                 .from(myCm)
                 .join(CONVERSATION).on(myCm.CONVERSATION_ID.eq(CONVERSATION.ID))

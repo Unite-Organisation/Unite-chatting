@@ -6,6 +6,11 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+  cloud:
+    gcp:
+      project-id: ${GOOGLE_PROJECT_ID}
+      credentials:
+        location: ${GOOGLE_APPLICATION_CREDENTIALS}
 server:
   servlet:
     context-path: /v1/api
@@ -22,3 +27,5 @@ springdoc:
 services:
   chatting:
     apikey: vV3KptV5DpX
+
+
