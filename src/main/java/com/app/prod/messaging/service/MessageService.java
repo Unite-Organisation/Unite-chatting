@@ -81,12 +81,13 @@ public class MessageService {
         messageRepository.insertOne(record);
         log.info("Created one message by {}, on {}", user.getId(), now);
 
+        String tokenizedFilePath = fileService.getFileUrl(filePath);
         return new MessageResponse(
                 record.getId(),
                 record.getConversationId(),
                 record.getSenderId(),
                 user.getFirstName() + " " + user.getLastName(),
-                record.getContent(),
+                tokenizedFilePath,
                 record.getSendAt(),
                 MessageType.FILE
         );

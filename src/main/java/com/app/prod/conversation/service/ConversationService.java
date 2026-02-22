@@ -7,7 +7,9 @@ import com.app.prod.conversation.repository.ConversationRepository;
 import com.app.prod.exceptions.exceptions.BadRequestException;
 import com.app.prod.exceptions.exceptions.EntityNotPresentException;
 import com.app.prod.messaging.repository.MessageRepository;
+import com.app.prod.messaging.repository.MessageType;
 import com.app.prod.shared.EntityCreatedResponse;
+import com.app.prod.storage.file.FileService;
 import com.app.prod.utils.Pagination;
 import com.app.prod.utils.Validate;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,7 @@ public class ConversationService {
     private final MessageRepository messageRepository;
     private final Clock clock;
     private final Validate validate;
+    private final FileService fileService;
 
     public List<ConversationResponse> getConversations(AppUserRecord user, Pagination pagination) {
         List<ConversationResponse> conversations = conversationRepository.findConversationForUser(user.getId(), pagination);
@@ -87,6 +90,23 @@ public class ConversationService {
     public List<ConversationMessageResponse> getConversationContent(UUID conversationId, Pagination pagination) {
         validate.conversation(conversationId);
         List<ConversationMessageResponse> messages = messageRepository.findByConversationId(conversationId, pagination);
+
+        messages = messages.stream().map(message -> {
+            String content = message.content();
+            if (message.messageType() == MessageType.FILE) {
+                content = fileService.getFileUrl(content);
+            }
+
+            return new ConversationMessageResponse(
+                    message.author(),
+                    message.authorName(),
+                    message.authorLastName(),
+                    message.sendAt(),
+                    content,
+                    message.messageType()
+            );
+        }).toList();
+
         log.info("Fetched {} messages in conversation: {}", messages.size(), conversationId);
         return messages;
     }
