@@ -6,6 +6,7 @@ import com.app.prod.config.security.UserDetailsServiceImpl;
 import com.app.prod.config.websocket.WebSocketUserManager;
 import com.app.prod.exceptions.exceptions.BadRequestException;
 import com.app.prod.exceptions.exceptions.UserNotAuthenticatedException;
+import com.app.prod.messaging.dto.CreateMessageRequest;
 import com.app.prod.utils.Validate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -100,11 +101,13 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
     }
 
     private UUID extractIdFromPayload(Message<?> message) {
+        Object payload = message.getPayload();
         try {
-            byte[] payload = (byte[]) message.getPayload();
-            JsonNode node = objectMapper.readTree(payload);
-            if (node.has("conversationId")) {
-                return UUID.fromString(node.get("conversationId").asText());
+            if (payload instanceof byte[] bytes) {
+                JsonNode node = objectMapper.readTree(bytes);
+                return node.has("conversationId") ? UUID.fromString(node.get("conversationId").asText()) : null;
+            } else if (payload instanceof CreateMessageRequest request) {
+                return request.conversationId();
             }
         } catch (Exception e) {
             log.error("Failed to parse payload for conversationId", e);

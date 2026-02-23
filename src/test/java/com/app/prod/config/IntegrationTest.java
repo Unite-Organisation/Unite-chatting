@@ -1,10 +1,15 @@
 package com.app.prod.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 public abstract class IntegrationTest {
+
+    @Autowired
+    protected MockMvc mockMvc;
 
     static final PostgreSQLContainer<?> postgres =
             new PostgreSQLContainer<>("postgres:16")

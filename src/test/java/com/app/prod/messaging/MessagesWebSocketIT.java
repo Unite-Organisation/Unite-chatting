@@ -4,9 +4,11 @@ import com.app.prod.builders.ActivityPersistanceFactory;
 import com.app.prod.builders.ConversationMemberPersistanceFactory;
 import com.app.prod.builders.ConversationPersistanceFactory;
 import com.app.prod.builders.UserPersistanceFactory;
+import com.app.prod.config.ApiTest;
 import com.app.prod.config.IntegrationTest;
 import com.app.prod.messaging.dto.CreateMessageRequest;
 import com.app.prod.messaging.dto.MessageResponse;
+import com.app.prod.mocking.ApiTestClient;
 import com.app.prod.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jooq.sources.tables.records.AppUserRecord;
@@ -14,27 +16,35 @@ import org.jooq.sources.tables.records.ConversationRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.MediaType;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import java.lang.reflect.Type;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import static com.app.prod.config.Constants.BCRYPT_PASSWORD_ENCODER_STRENGTH;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ApiTest
 public class MessagesWebSocketIT extends IntegrationTest {
 
     private WebSocketStompClient stompClient;
@@ -60,6 +70,8 @@ public class MessagesWebSocketIT extends IntegrationTest {
     private UserService userService;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private ApiTestClient api;
 
     @BeforeEach
     void setup() {
@@ -83,8 +95,8 @@ public class MessagesWebSocketIT extends IntegrationTest {
                 .withRandomValues()
                 .buildAndSave();
 
-        conversationMemberPersistanceFactory.getNewMember().bind(user1.getId(), conversation.getId());
-        conversationMemberPersistanceFactory.getNewMember().bind(user2.getId(), conversation.getId());
+        conversationMemberPersistanceFactory.getNewMember().bind(user1.getId(), conversation.getId()).buildAndSave();
+        conversationMemberPersistanceFactory.getNewMember().bind(user2.getId(), conversation.getId()).buildAndSave();
 
         prepareClient(password);
     }
@@ -102,33 +114,14 @@ public class MessagesWebSocketIT extends IntegrationTest {
 
     @Test
     void shouldSendMessageAndReceiveResponse() throws Exception {
-        StompHeaders connectHeaders = new StompHeaders();
-        connectHeaders.add("Authorization", "Bearer " + user1token);
+        // user1 subscribes topic
+        SessionHolder sessionHolder = userSubscribesTopic("/topic/conversation/" + conversation.getId(), user1token);
 
-        CompletableFuture<MessageResponse> resultKeeper = new CompletableFuture<>();
-
-        StompSession session = stompClient
-                .connectAsync(wsUrl, new WebSocketHttpHeaders(), connectHeaders, new StompSessionHandlerAdapter() {})
-                .get(5, TimeUnit.SECONDS);
-
-        // SUBSCRIBE
-        session.subscribe("/topic/conversation/" + conversation.getId(), new StompFrameHandler() {
-            @Override
-            public Type getPayloadType(StompHeaders headers) {
-                return MessageResponse.class;
-            }
-
-            @Override
-            public void handleFrame(StompHeaders headers, Object payload) {
-                resultKeeper.complete((MessageResponse) payload);
-            }
-        });
-
-        // SEND
+        // user2 sends message
         CreateMessageRequest request = new CreateMessageRequest(conversation.getId(), "Cześć z testu!");
-        session.send("/app/message", request);
+        sessionHolder.session.send("/app/message", request);
 
-        MessageResponse response = resultKeeper.get(10, TimeUnit.SECONDS);
+        MessageResponse response = sessionHolder.receiverArrival.get(10, TimeUnit.SECONDS);
 
         assertNotNull(response);
         assertEquals("Cześć z testu!", response.content());
@@ -137,29 +130,10 @@ public class MessagesWebSocketIT extends IntegrationTest {
     @Test
     void shouldUserReceiveMessageFromAnotherUser() throws Exception {
 
-        // RECEIVER SUBSCRIBES
-        StompHeaders headers2 = new StompHeaders();
-        headers2.add("Authorization", "Bearer " + user2token);
+        // user2 subscribes topic
+        SessionHolder sessionHolder = userSubscribesTopic("/topic/conversation/" + conversation.getId(), user2token);
 
-        CompletableFuture<MessageResponse> receiverArrival = new CompletableFuture<>();
-
-        StompSession session = stompClient
-                .connectAsync(wsUrl, new WebSocketHttpHeaders(), headers2, new StompSessionHandlerAdapter() {})
-                .get(5, TimeUnit.SECONDS);
-
-        session.subscribe("/topic/conversation/" + conversation.getId(), new StompFrameHandler() {
-            @Override
-            public Type getPayloadType(StompHeaders headers) {
-                return MessageResponse.class;
-            }
-
-            @Override
-            public void handleFrame(StompHeaders headers, Object payload) {
-                receiverArrival.complete((MessageResponse) payload);
-            }
-        });
-
-        // SENDER SENDS
+        // user1 sends message
         StompHeaders headers1 = new StompHeaders();
         headers1.add("Authorization", "Bearer " + user1token);
 
@@ -171,11 +145,61 @@ public class MessagesWebSocketIT extends IntegrationTest {
         CreateMessageRequest request = new CreateMessageRequest(conversation.getId(), messageText);
         session1.send("/app/message", request);
 
-        MessageResponse receivedBySecondUser = receiverArrival.get(10, TimeUnit.SECONDS);
+        MessageResponse receivedBySecondUser = sessionHolder.receiverArrival.get(10, TimeUnit.SECONDS);
 
         assertNotNull(receivedBySecondUser);
         assertEquals(messageText, receivedBySecondUser.content());
         assertEquals(user1.getId(), receivedBySecondUser.authorId());
     }
+
+    @Test
+    void shoudUserReceiveFileMessage() throws Exception {
+
+        // user2 subscribes topic
+        SessionHolder sessionHolder = userSubscribesTopic("/topic/conversation/" + conversation.getId(), user2token);
+
+        MockMultipartFile file = new MockMultipartFile("file", "test-image.png", MediaType.IMAGE_PNG_VALUE, "test content".getBytes());
+        mockMvc.perform(multipart("/message/conversation/{id}/file", conversation.getId())
+                        .file(file)
+                        .header("Authorization", "Bearer " + user1token)
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isOk());
+
+
+        MessageResponse receivedBySecondUser = sessionHolder.receiverArrival.get(10, TimeUnit.SECONDS);
+        assertNotNull(receivedBySecondUser);
+        assertEquals("test-filepath-tokenized", receivedBySecondUser.content());
+        assertEquals(user1.getId(), receivedBySecondUser.authorId());
+    }
+
+    private SessionHolder userSubscribesTopic(String topic, String token) throws Exception {
+        StompHeaders headers = new StompHeaders();
+        headers.add("Authorization", "Bearer " + token);
+
+        CompletableFuture<MessageResponse> receiverArrival = new CompletableFuture<>();
+
+        StompSession session = stompClient
+                .connectAsync(wsUrl, new WebSocketHttpHeaders(), headers, new StompSessionHandlerAdapter() {})
+                .get(5, TimeUnit.SECONDS);
+
+        session.subscribe(topic, new StompFrameHandler() {
+            @Override
+            public Type getPayloadType(StompHeaders headers2) {
+                return MessageResponse.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers2, Object payload) {
+                receiverArrival.complete((MessageResponse) payload);
+            }
+        });
+
+        return new SessionHolder(session, receiverArrival);
+    }
+
+    private record SessionHolder(
+            StompSession session,
+            CompletableFuture<MessageResponse> receiverArrival
+    ) {}
 
 }
