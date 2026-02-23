@@ -11,6 +11,7 @@ import com.app.prod.messaging.dto.MessageResponse;
 import com.app.prod.mocking.ApiTestClient;
 import com.app.prod.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jooq.sources.tables.AppUser;
 import org.jooq.sources.tables.records.AppUserRecord;
 import org.jooq.sources.tables.records.ConversationRecord;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,8 +71,6 @@ public class MessagesWebSocketIT extends IntegrationTest {
     private UserService userService;
     @Autowired
     private ObjectMapper objectMapper;
-    @Autowired
-    private ApiTestClient api;
 
     @BeforeEach
     void setup() {
@@ -154,22 +153,24 @@ public class MessagesWebSocketIT extends IntegrationTest {
 
     @Test
     void shoudUserReceiveFileMessage() throws Exception {
+        AppUserRecord sender = loggedUser();
 
         // user2 subscribes topic
         SessionHolder sessionHolder = userSubscribesTopic("/topic/conversation/" + conversation.getId(), user2token);
 
         MockMultipartFile file = new MockMultipartFile("file", "test-image.png", MediaType.IMAGE_PNG_VALUE, "test content".getBytes());
-        mockMvc.perform(multipart("/message/conversation/{id}/file", conversation.getId())
-                        .file(file)
-                        .header("Authorization", "Bearer " + user1token)
-                        .contentType(MediaType.MULTIPART_FORM_DATA))
+
+        api.performAuthenticated(multipart("/message/conversation/{id}/file", conversation.getId())
+                    .file(file)
+                    .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isOk());
+
 
 
         MessageResponse receivedBySecondUser = sessionHolder.receiverArrival.get(10, TimeUnit.SECONDS);
         assertNotNull(receivedBySecondUser);
         assertEquals("test-filepath-tokenized", receivedBySecondUser.content());
-        assertEquals(user1.getId(), receivedBySecondUser.authorId());
+        assertEquals(sender.getId(), receivedBySecondUser.authorId());
     }
 
     private SessionHolder userSubscribesTopic(String topic, String token) throws Exception {

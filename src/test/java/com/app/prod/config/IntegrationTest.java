@@ -1,15 +1,16 @@
 package com.app.prod.config;
 
+import com.app.prod.mocking.ApiTestClient;
+import org.jooq.sources.tables.records.AppUserRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 public abstract class IntegrationTest {
 
     @Autowired
-    protected MockMvc mockMvc;
+    public ApiTestClient api;
 
     static final PostgreSQLContainer<?> postgres =
             new PostgreSQLContainer<>("postgres:16")
@@ -30,6 +31,10 @@ public abstract class IntegrationTest {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
+    }
+
+    public AppUserRecord loggedUser() {
+        return api.getLoggedUser();
     }
 }
 
