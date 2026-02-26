@@ -1,11 +1,15 @@
 package com.app.prod.builders;
 
+import com.app.prod.conversation.repository.ConversationMemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.jooq.sources.tables.records.AppUserRecord;
+import org.jooq.sources.tables.records.ConversationMemberRecord;
 import org.jooq.sources.tables.records.ConversationRecord;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import com.app.prod.conversation.repository.ConversationRepository;
@@ -16,8 +20,13 @@ public class ConversationPersistanceFactory {
 
     private final Clock clock;
     private final ConversationRepository conversationRepository;
+    private final ConversationMemberRepository conversationMemberRepository;
+    private final ConversationMemberPersistanceFactory conversationMemberPersistanceFactory;
+
+    private List<ConversationMemberRecord> conversationMemberRecords;
 
     public Builder getNewConversation() {
+        conversationMemberRecords = new ArrayList<>();
         return new Builder();
     }
 
@@ -63,6 +72,20 @@ public class ConversationPersistanceFactory {
             return this;
         }
 
+        public Builder addUser(AppUserRecord user) {
+            if (instance.getId() == null) {
+                instance.setId(UUID.randomUUID());
+            }
+
+            ConversationMemberRecord member = conversationMemberPersistanceFactory.getNewMember()
+                    .bind(user.getId(), instance.getId())
+                    .build();
+
+            conversationMemberRecords.add(member);
+
+            return this;
+        }
+
         public Builder asGroup(String groupName) {
             instance.setIsGroup(true);
             instance.setName(groupName);
@@ -76,6 +99,11 @@ public class ConversationPersistanceFactory {
         public ConversationRecord buildAndSave() {
             ConversationRecord record = build();
             conversationRepository.insertOne(record);
+
+            if (conversationMemberRecords != null && !conversationMemberRecords.isEmpty()) {
+                conversationMemberRepository.insertMany(conversationMemberRecords);
+            }
+
             return record;
         }
     }

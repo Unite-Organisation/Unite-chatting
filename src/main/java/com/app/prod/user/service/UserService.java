@@ -49,4 +49,8 @@ public class UserService {
         return jwtService.generateToken((org.springframework.security.core.userdetails.User) ud);
     }
 
+    public void updatePassword(UUID userId, String password){
+        userRepository.updatePassword(userId, password);
+    }
+
 }

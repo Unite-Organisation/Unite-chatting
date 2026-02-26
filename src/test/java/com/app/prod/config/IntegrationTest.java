@@ -1,16 +1,21 @@
 package com.app.prod.config;
 
 import com.app.prod.mocking.ApiTestClient;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jooq.sources.tables.records.AppUserRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.servlet.ResultActions;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 public abstract class IntegrationTest {
 
     @Autowired
     public ApiTestClient api;
+    @Autowired
+    protected ObjectMapper objectMapper;
 
     static final PostgreSQLContainer<?> postgres =
             new PostgreSQLContainer<>("postgres:16")
@@ -35,6 +40,11 @@ public abstract class IntegrationTest {
 
     public AppUserRecord loggedUser() {
         return api.getLoggedUser();
+    }
+
+    public <T> T readResponse(ResultActions resultActions, TypeReference<T> typeReference) throws Exception {
+        String content = resultActions.andReturn().getResponse().getContentAsString();
+        return objectMapper.readValue(content, typeReference);
     }
 }
 

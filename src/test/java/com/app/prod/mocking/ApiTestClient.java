@@ -64,8 +64,17 @@ public class ApiTestClient {
 
     public ApiTestClient login(AppUserRecord user) {
         loggedUser = user;
-        setTokenForUser(user, user.getPassword());
+        String rawPassword = user.getPassword();
+        encodeUsersPassword(user);
+        setTokenForUser(user, rawPassword);
         return this;
+    }
+
+    private void encodeUsersPassword(AppUserRecord user) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(BCRYPT_PASSWORD_ENCODER_STRENGTH);
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+        userService.updatePassword(user.getId(), encodedPassword);
     }
 
     public String getToken() {

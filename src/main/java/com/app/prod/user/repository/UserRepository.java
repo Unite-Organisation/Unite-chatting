@@ -38,4 +38,11 @@ public class UserRepository extends BaseJooqRepository<AppUser, AppUserRecord, U
                 .execute();
     }
 
+    public void updatePassword(UUID userId, String password){
+        dslContext.update(APP_USER)
+                .set(APP_USER.PASSWORD, password)
+                .where(APP_USER.ID.eq(userId))
+                .execute();
+    }
+
 }
