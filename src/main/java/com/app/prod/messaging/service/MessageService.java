@@ -46,7 +46,6 @@ public class MessageService {
 
         return new MessageResponse(
                 record.getId(),
-                record.getConversationId(),
                 record.getSenderId(),
                 user.getFirstName() + " " + user.getLastName(),
                 record.getContent(),
@@ -84,7 +83,6 @@ public class MessageService {
         String tokenizedFilePath = fileService.getFileUrl(filePath);
         return new MessageResponse(
                 record.getId(),
-                record.getConversationId(),
                 record.getSenderId(),
                 user.getFirstName() + " " + user.getLastName(),
                 tokenizedFilePath,

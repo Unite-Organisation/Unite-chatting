@@ -42,11 +42,19 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
             return message;
         }
 
-        switch (accessor.getCommand()) {
-            case CONNECT -> handleConnect(accessor);
-            case SUBSCRIBE -> handleSubscribe(accessor);
-            case DISCONNECT -> handleDisconnectUnsubscribe(accessor);
-            case SEND -> handleSend(accessor, message);
+        if (accessor.getCommand() == null) {
+            return message;
+        }
+
+        try {
+            switch (accessor.getCommand()) {
+                case CONNECT -> handleConnect(accessor);
+                case SUBSCRIBE -> handleSubscribe(accessor);
+                case DISCONNECT -> handleDisconnectUnsubscribe(accessor);
+                case SEND -> handleSend(accessor, message);
+            }
+        } catch (Exception e) {
+            log.error("Error in JwtChannelInterceptor for command {}: {}", accessor.getCommand(), e.getMessage(), e);
         }
 
         return message;

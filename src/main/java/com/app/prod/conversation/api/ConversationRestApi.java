@@ -3,6 +3,7 @@ package com.app.prod.conversation.api;
 import com.app.prod.config.security.GlobalSecurityManager;
 import com.app.prod.conversation.dto.*;
 import com.app.prod.conversation.service.ConversationService;
+import com.app.prod.messaging.dto.MessageResponse;
 import com.app.prod.shared.EntityCreatedResponse;
 import com.app.prod.utils.Pagination;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,7 +40,7 @@ public class ConversationRestApi {
     }
 
     @GetMapping("/{id}")
-    public List<ConversationMessageResponse> getConversationContent(@PathVariable UUID id, @Valid @ModelAttribute Pagination pagination){
+    public List<MessageResponse> getConversationContent(@PathVariable UUID id, @Valid @ModelAttribute Pagination pagination){
         return conversationService.getConversationContent(id, pagination);
     }
 
