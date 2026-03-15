@@ -21,7 +21,7 @@ server:
   port: 8081
 
 jwt:
-  secret: nx4bak6442nojjhf83smacno9j31jcch87h=c2ee2ybc2yegce
+  secret: nx4bak6442nojjhf83smacno9j31jcch87hc2ee2ybc2yegce
   expiration-ms: 3600000
 
 springdoc:

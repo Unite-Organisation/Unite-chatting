@@ -6,11 +6,11 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record ConversationMessageResponse(
-        UUID author,
-        String authorName,
-        String authorLastName,
-        LocalDateTime sendAt,
+        UUID id,
+        UUID authorId,
+        String authorDisplayName,
         String content,
+        LocalDateTime sentAt,
         MessageType messageType
 ) {
 }

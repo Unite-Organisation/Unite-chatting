@@ -1,6 +1,7 @@
 package com.app.prod.messaging.repository;
 
 import com.app.prod.conversation.dto.ConversationMessageResponse;
+import com.app.prod.messaging.dto.MessageResponse;
 import com.app.prod.utils.BaseJooqRepository;
 import com.app.prod.utils.Pagination;
 import org.jooq.DSLContext;
@@ -21,14 +22,15 @@ public class MessageRepository extends BaseJooqRepository<Message, MessageRecord
         super(dsl, Message.MESSAGE, Message.MESSAGE.ID);
     }
 
-    public List<ConversationMessageResponse> findByConversationId(UUID conversationId, Pagination pagination) {
+    public List<MessageResponse> findByConversationId(UUID conversationId, Pagination pagination) {
         return dslContext.select(
                         APP_USER.ID,
                         APP_USER.FIRST_NAME,
                         APP_USER.LAST_NAME,
                         MESSAGE.SEND_AT,
                         MESSAGE.CONTENT,
-                        MESSAGE.MESSAGE_TYPE
+                        MESSAGE.MESSAGE_TYPE,
+                        MESSAGE.ID
                 )
                 .from(MESSAGE)
                 .leftJoin(APP_USER).on(APP_USER.ID.eq(MESSAGE.SENDER_ID))
@@ -36,12 +38,12 @@ public class MessageRepository extends BaseJooqRepository<Message, MessageRecord
                 .orderBy(MESSAGE.SEND_AT)
                 .offset(pagination.getOffset())
                 .limit(pagination.pageSize())
-                .fetch(record -> new ConversationMessageResponse(
+                .fetch(record -> new MessageResponse(
+                        record.get(MESSAGE.ID),
                         record.get(APP_USER.ID),
-                        record.get(APP_USER.FIRST_NAME),
-                        record.get(APP_USER.LAST_NAME),
-                        record.get(MESSAGE.SEND_AT),
+                        record.get(APP_USER.FIRST_NAME) + " " + record.get(APP_USER.LAST_NAME),
                         record.get(MESSAGE.CONTENT),
+                        record.get(MESSAGE.SEND_AT),
                         MessageType.valueOf(record.get(MESSAGE.MESSAGE_TYPE))
                 ));
     }

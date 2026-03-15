@@ -5,7 +5,7 @@ import com.app.prod.conversation.mappers.ConversationMapper;
 import com.app.prod.conversation.repository.ConversationMemberRepository;
 import com.app.prod.conversation.repository.ConversationRepository;
 import com.app.prod.exceptions.exceptions.BadRequestException;
-import com.app.prod.exceptions.exceptions.EntityNotPresentException;
+import com.app.prod.messaging.dto.MessageResponse;
 import com.app.prod.messaging.repository.MessageRepository;
 import com.app.prod.messaging.repository.MessageType;
 import com.app.prod.shared.EntityCreatedResponse;
@@ -14,9 +14,9 @@ import com.app.prod.utils.Pagination;
 import com.app.prod.utils.Validate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jooq.sources.tables.Conversation;
 import org.jooq.sources.tables.records.AppUserRecord;
 import org.jooq.sources.tables.records.ConversationMemberRecord;
+import org.jooq.sources.tables.records.ConversationRecord;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,9 +87,9 @@ public class ConversationService {
         }
     }
 
-    public List<ConversationMessageResponse> getConversationContent(UUID conversationId, Pagination pagination) {
+    public List<MessageResponse> getConversationContent(UUID conversationId, Pagination pagination) {
         validate.conversation(conversationId);
-        List<ConversationMessageResponse> messages = messageRepository.findByConversationId(conversationId, pagination);
+        List<MessageResponse> messages = messageRepository.findByConversationId(conversationId, pagination);
 
         messages = messages.stream().map(message -> {
             String content = message.content();
@@ -97,12 +97,12 @@ public class ConversationService {
                 content = fileService.getFileUrl(content);
             }
 
-            return new ConversationMessageResponse(
-                    message.author(),
-                    message.authorName(),
-                    message.authorLastName(),
-                    message.sendAt(),
+            return new MessageResponse(
+                    message.id(),
+                    message.authorId(),
+                    message.authorDisplayName(),
                     content,
+                    message.sentAt(),
                     message.messageType()
             );
         }).toList();
@@ -110,16 +110,6 @@ public class ConversationService {
         log.info("Fetched {} messages in conversation: {}", messages.size(), conversationId);
         return messages;
     }
-
-    public UUID getConversationId(UUID user1Id, UUID user2Id){
-        return conversationRepository.findDirectConversationForUsers(user1Id, user2Id)
-                .orElseThrow(() -> new EntityNotPresentException(
-                        String.format("Conversation for %s and %s not found", user1Id, user2Id),
-                        Conversation.class.getSimpleName()
-                ));
-
-    }
-
 
     @Transactional
     public void createGroupConversation(GroupConversationRequest request, AppUserRecord user) {
@@ -133,5 +123,26 @@ public class ConversationService {
     private void addUserToConversation(UUID userId, UUID conversationId){
         var now = LocalDateTime.now(clock);
         conversationMemberRepository.insertOne(new ConversationMemberRecord(UUID.randomUUID(), userId, conversationId, now));
+    }
+
+    public void createConversationsWithMembers(UUID userId, List<UUID> usersInArea){
+
+        List<ConversationRecord> conversationRecords = new ArrayList<>();
+        List<ConversationMemberRecord> conversationMemberRecords = new ArrayList<>();
+        var now = LocalDateTime.now(clock);
+
+        // conversation with other users
+        for(UUID contactId : usersInArea){
+            var conversationId = UUID.randomUUID();
+
+            conversationRecords.add(new ConversationRecord(conversationId, false, null, now, now));
+
+            conversationMemberRecords.add(new ConversationMemberRecord(UUID.randomUUID(), userId, conversationId, now));
+            conversationMemberRecords.add(new ConversationMemberRecord(UUID.randomUUID(), contactId, conversationId, now));
+
+        }
+
+        conversationRepository.insertMany(conversationRecords);
+        conversationMemberRepository.insertMany(conversationMemberRecords);
     }
 }
