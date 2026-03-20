@@ -87,9 +87,9 @@ public class ConversationService {
         }
     }
 
-    public List<MessageResponse> getConversationContent(UUID conversationId, Pagination pagination) {
+    public List<MessageResponse> getConversationContent(UUID conversationId, UUID lastMessageId, int pageSize) {
         validate.conversation(conversationId);
-        List<MessageResponse> messages = messageRepository.findByConversationId(conversationId, pagination);
+        List<MessageResponse> messages = messageRepository.findByConversationId(conversationId, lastMessageId, pageSize);
 
         messages = messages.stream().map(message -> {
             String content = message.content();
