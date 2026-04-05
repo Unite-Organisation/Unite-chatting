@@ -3,4 +3,4 @@ security:
 
 spring:
   flyway:
-    locations: classpath:db/migration,classpath:db/test-data
+    locations: classpath:db/migration

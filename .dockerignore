@@ -1,0 +1,8 @@
+.env
+.env.properties
+target/
+.git/
+.idea/
+*.iml
+src/main/resources/gcp-account-file.json
+gcp-account-file.json

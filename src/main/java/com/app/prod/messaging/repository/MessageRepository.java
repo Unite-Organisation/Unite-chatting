@@ -22,8 +22,8 @@ public class MessageRepository extends BaseJooqRepository<Message, MessageRecord
         super(dsl, Message.MESSAGE, Message.MESSAGE.ID);
     }
 
-    public List<MessageResponse> findByConversationId(UUID conversationId, Pagination pagination) {
-        return dslContext.select(
+    public List<MessageResponse> findByConversationId(UUID conversationId, UUID lastMessageId, int pageSize) {
+        var query = dslContext.select(
                         APP_USER.ID,
                         APP_USER.FIRST_NAME,
                         APP_USER.LAST_NAME,
@@ -34,10 +34,19 @@ public class MessageRepository extends BaseJooqRepository<Message, MessageRecord
                 )
                 .from(MESSAGE)
                 .leftJoin(APP_USER).on(APP_USER.ID.eq(MESSAGE.SENDER_ID))
-                .where(MESSAGE.CONVERSATION_ID.eq(conversationId))
-                .orderBy(MESSAGE.SEND_AT)
-                .offset(pagination.getOffset())
-                .limit(pagination.pageSize())
+                .where(MESSAGE.CONVERSATION_ID.eq(conversationId));
+
+        if (lastMessageId != null) {
+            query = query.and(MESSAGE.SEND_AT.lt(
+                    dslContext.select(MESSAGE.SEND_AT)
+                            .from(MESSAGE)
+                            .where(MESSAGE.ID.eq(lastMessageId))
+            ));
+        }
+
+        return query
+                .orderBy(MESSAGE.SEND_AT.desc())
+                .limit(pageSize)
                 .fetch(record -> new MessageResponse(
                         record.get(MESSAGE.ID),
                         record.get(APP_USER.ID),

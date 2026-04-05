@@ -10,19 +10,19 @@ spring:
     gcp:
       project-id: ${GCP_PROJECT_ID}
       credentials:
-        location: ${GCP_APPLICATION_CREDENTIALS}
+        location: ${GCP_APPLICATION_CREDENTIALS:}
   servlet:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
 server:
   servlet:
-    context-path: /v1/api
-  port: 8081
+    context-path: /v1/api/chat
+  port: ${PORT:8080 }
 
 jwt:
-  secret: nx4bak6442nojjhf83smacno9j31jcch87hc2ee2ybc2yegce
-  expiration-ms: 3600000
+  secret: ${JWT_SECRET}
+  expiration-ms: ${JWT_EXPIRATION_TIME}
 
 springdoc:
   swagger-ui:
@@ -30,7 +30,7 @@ springdoc:
 
 services:
   chatting:
-    apikey: vV3KptV5DpX
+    apikey: ${CHATTING_API_KEY}
 
 gcp:
   bucket:

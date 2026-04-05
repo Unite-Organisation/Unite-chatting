@@ -1,2 +1,11 @@
 security:
   enabled: true
+
+springdoc:
+  swagger-ui:
+    enabled: false
+
+spring:
+  flyway:
+    locations: classpath:db/migration
+    enabled: true

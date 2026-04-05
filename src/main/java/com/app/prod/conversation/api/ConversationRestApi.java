@@ -40,8 +40,11 @@ public class ConversationRestApi {
     }
 
     @GetMapping("/{id}")
-    public List<MessageResponse> getConversationContent(@PathVariable UUID id, @Valid @ModelAttribute Pagination pagination){
-        return conversationService.getConversationContent(id, pagination);
+    public List<MessageResponse> getConversationContent(
+            @PathVariable UUID id,
+            @RequestParam(required = false) UUID lastMessageId,
+            @RequestParam(defaultValue = "50") int pageSize) {
+        return conversationService.getConversationContent(id, lastMessageId, pageSize);
     }
 
     @PostMapping("/group")
