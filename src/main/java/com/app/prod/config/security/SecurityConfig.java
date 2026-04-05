@@ -44,7 +44,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(Arrays.asList(ApiOrigins.getFrontendOrigin()));
+        config.setAllowedOrigins(ApiOrigins.getAllOrigins());
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(Arrays.asList("*"));
 
@@ -88,7 +88,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/ws/**"
                         ).permitAll()
-                        .requestMatchers("/v1/api/internal/**").hasRole("INTERNAL_SERVICE")
+                        .requestMatchers("/internal/**").hasRole("INTERNAL_SERVICE")
                         .anyRequest().authenticated()
                 )
 

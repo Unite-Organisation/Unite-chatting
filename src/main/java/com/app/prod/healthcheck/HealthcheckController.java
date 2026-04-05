@@ -20,6 +20,6 @@ public class HealthcheckController {
 
     @GetMapping()
     public ResponseEntity<String> healthCheck(){
-        return ResponseEntity.ok(String.format("[%s] App stable and running.", LocalTime.now(clock)));
+        return ResponseEntity.ok(String.format("[%s] Unite-chatting app stable and running.", LocalTime.now(clock)));
     }
 }

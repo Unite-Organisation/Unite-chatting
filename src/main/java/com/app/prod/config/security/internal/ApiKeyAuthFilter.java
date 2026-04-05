@@ -28,7 +28,7 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
 
         String requestApiKey = request.getHeader(API_KEY_HEADER);
 
-        if (request.getRequestURI().startsWith("/v1/api/internal") && apiKey.equals(requestApiKey)) {
+        if (request.getRequestURI().startsWith("/v1/api/chat/internal") && apiKey.equals(requestApiKey)) {
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                     "INTERNAL_SERVICE",
                     null,
