@@ -1,8 +1,8 @@
 package com.app.prod.exceptions.handler;
 
-import com.app.prod.config.security.TokenSecurityManager;
 import com.app.prod.exceptions.ErrorResponse;
 import com.app.prod.exceptions.exceptions.*;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +20,12 @@ public class GlobalExceptionHandler {
         log.info("Data already exists in database. Exception content: {}", e.getMessage());
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.CONFLICT, e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ErrorResponse> handleException(ExpiredJwtException e){
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
     @ExceptionHandler(AuthenticationException.class)
